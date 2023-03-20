@@ -44,8 +44,9 @@ app.listen(3000, () => {
 })
 
 app.use(bodyParser.json());
+mongoose.connect("mongodb://localhost:27017/userdb", () => {
 
-mongoose.connect("mongodb+srv://suraj:suraj@cluster0.s8dvi.mongodb.net/FoodService?retryWrites=true&w=majority", () => {
+// mongoose.connect("mongodb+srv://suraj:suraj@cluster0.s8dvi.mongodb.net/FoodService?retryWrites=true&w=majority", () => {
     console.log("Connected to database");
 });
 
@@ -71,6 +72,7 @@ app.get('/', (req, res) => {
  *         description: Some server error
  */
 app.post('/addFood', (req, res, next) => {
+    console.log(req);
     var newFood = {
         category: req.body.category,
         name: req.body.name,
@@ -134,6 +136,8 @@ app.post('/addFood', (req, res, next) => {
  *         description: The list of the Foods
  */
 app.get('/getfoods', (req, res, next) => {
+      res.header("Access-Control-Allow-Origin", "*");
+
     Food.find().then((food) => {
         res.json(food);
     }).catch(next);
@@ -196,6 +200,13 @@ app.delete("/food/:id", (req, res, next) => {
         }
     }).catch(next);
 })
+
+app.put("/food/:id/update", (req, res,next) =>{
+    Food.findByIdAndUpdate(req.params.id, {$set: req.body}, function (err, student) {
+        if (err) return next(err);
+        res.send('Student udpated.');
+    });
+});
 
 // error handling middleware
 app.use(function (err, req, res, next) {
